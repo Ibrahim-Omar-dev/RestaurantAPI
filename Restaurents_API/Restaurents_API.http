@@ -1,0 +1,22 @@
+@Restaurents_API_HostAddress = https://localhost:7113
+@host=https://localhost
+@port=7005
+
+@Restaurants.API_HostAddress=https://localhost:7005
+
+
+GET {{Restaurants.API_HostAddress}}/api/restaurants/GetRestaurants
+###
+@id=6
+GET {{Restaurents_API_HostAddress}}/api/restaurants/GetById/{{id}}
+
+###
+
+PUT {{Restaurents_API_HostAddress}}/api/restaurants/Update/{id:int}
+Content-Type: application/json
+
+{
+  //UpdateRestaurantDto
+}
+
+###

@@ -1,0 +1,58 @@
+# Build results
+bin/
+obj/
+out/
+
+# User-specific files
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+
+# Visual Studio
+.vs/
+*.dbmdl
+*.jfm
+*.cache
+*.pdb
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# Environment files
+.env
+
+# Publish
+*.publishsettings
+
+# Test results
+TestResult*/
+*.trx
+*.coverage
+*.coveragexml
+
+# Resharper
+_ReSharper*/
+*.DotSettings.user
+
+# NuGet
+*.nupkg
+*.snupkg
+*.nuspec
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Others
+*.swp
+*.bak
+*.tmp
+*.DS_Store
+Thumbs.db
+
+# Ignore all JSON files
+*.json
