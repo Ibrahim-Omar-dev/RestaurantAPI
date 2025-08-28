@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Restaurant.Application.Command.CreateRestaurant;
+using Restaurant.Application.Command.UpdateRestaurant;
 using Restaurant.Model.Entity;
 
 namespace Restaurant.Application.Restaurants.Dtos
@@ -17,7 +19,7 @@ namespace Restaurant.Application.Restaurants.Dtos
                  .ForMember(dest => dest.Dishes, opt => opt.MapFrom(src => src.Dishes))
                   .ReverseMap();
 
-            CreateMap<CreateRestaurantDto, Restaurantt>()
+            CreateMap<CreateRestaurantCommand, Restaurantt>()
                 .ForMember(d => d.Address, opt =>
                 opt.MapFrom(src => new Address
                 {
@@ -26,14 +28,7 @@ namespace Restaurant.Application.Restaurants.Dtos
                     PostalCode = src.PostalCode
                 })).ReverseMap();
 
-            CreateMap<UpdateRestaurantDto, Restaurantt>()
-                .ForMember(d => d.Address, opt =>
-                opt.MapFrom(src => new Address
-                {
-                    City = src.City,
-                    Street = src.Street,
-                    PostalCode = src.PostalCode
-                })).ReverseMap();
+            CreateMap<UpdateRestaurantCommand, Restaurantt>().ReverseMap();
         }
     }
 }

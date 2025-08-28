@@ -1,5 +1,11 @@
 ﻿using AutoMapper;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Restaurant.Application.Command.CreateRestaurant;
+using Restaurant.Application.Command.DeleteRestaurant;
+using Restaurant.Application.Command.UpdateRestaurant;
+using Restaurant.Application.Queries.GetAllRestaurant;
+using Restaurant.Application.Queries.GetRestaurantById;
 using Restaurant.Application.Restaurants;
 using Restaurant.Application.Restaurants.Dtos;
 
@@ -9,50 +15,60 @@ namespace Restaurants_API.Controllers
     [Route("api/restaurants")]
     public class RestaurantsController : ControllerBase
     {
-        private readonly IRepositoryServices services;
+        private readonly IMediator mediator;
         private readonly IMapper mapper;
 
-        public RestaurantsController(IRepositoryServices services, IMapper mapper)
+        public RestaurantsController(IMediator mediator, IMapper mapper)
         {
-            this.services = services;
+            this.mediator = mediator;
             this.mapper = mapper;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetRestaurants()
         {
-            var restaurant = await services.GetAllAsync();
-            var restaurantDto = mapper.Map<List<RestaurantDto>>(restaurant);
-            return Ok(restaurantDto);
+            var restaurant = await mediator.Send(new GetAllRestaurantQuery());
+            return Ok(restaurant);
         }
         [HttpGet("GetById/{id:int}")]
         public async Task<IActionResult> GetRestaurantById([FromRoute] int id)
         {
-            var restaurant = await services.GetByIdAsync(id);
+            var restaurant = await mediator.Send(new GetRestaurantByIdQuery(id));
             if (restaurant == null)
             {
                 return NotFound();
             }
-            var restaurantDto = mapper.Map<RestaurantDto>(restaurant);
-            return Ok(restaurantDto);
+
+            return Ok(restaurant);
         }
+
         [HttpPost("Create")]
-        public async Task<IActionResult> CreateRestaurant([FromBody] CreateRestaurantDto createRestaurantDto)
+        public async Task<IActionResult> CreateRestaurant([FromBody] CreateRestaurantCommand createRestaurantCommand)
         {
-            var newrestaurantId = await services.CreateAsync(createRestaurantDto);
+            var newrestaurantId = await mediator.Send(createRestaurantCommand);
             return Created(nameof(GetRestaurantById), new { id = newrestaurantId });
         }
-        [HttpPut("Update/{id:int}")]
-        public async Task<IActionResult> UpdateRestaurant([FromRoute] int id, [FromBody] UpdateRestaurantDto updateRestaurantDto)
+        [HttpDelete("Delete/{id:int}")]
+        public async Task<IActionResult> DeleteRestaurant([FromRoute] int id)
         {
-            var existingRestaurant = await services.GetByIdAsync(id);
-            if (existingRestaurant == null)
+            var result = await mediator.Send(new DeleteRestaurantCommand(id));
+            if (!result)
             {
                 return NotFound();
             }
-            var updatedRestaurant = await services.UpdateAsync(id, updateRestaurantDto);
-            var updatedRestaurantDto = mapper.Map<RestaurantDto>(updatedRestaurant);
-            return Ok(updatedRestaurantDto);
+            return NoContent();
+        }
+        [HttpPut("Update/{id:int}")]
+        public async Task<IActionResult> UpdateRestaurant([FromRoute] int id, UpdateRestaurantCommand updateRestaurantCommand)
+        {
+            updateRestaurantCommand.Id = id;
+            var result = await mediator.Send(updateRestaurantCommand);
+            if (!result)
+            {
+                return NotFound();
+            }
+            return NoContent();
+
         }
     }
 }

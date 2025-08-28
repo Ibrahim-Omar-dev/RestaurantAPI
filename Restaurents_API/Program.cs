@@ -2,6 +2,7 @@ using Restaurants.infrastructure.Seeder;
 using Restaurants.Infrastructure.Extension;
 using Restaurant.Application.Extension;
 using Microsoft.AspNetCore.Builder;
+using Serilog;
 
 namespace Restaurents_API
 {
@@ -21,6 +22,12 @@ namespace Restaurents_API
             // Infrastructure & Application layers
             builder.Services.AddInfrastructure(builder.Configuration);
             builder.Services.AddApplication();
+
+            Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug() // ?? important, shows SQL
+    .WriteTo.Console()
+    .Enrich.FromLogContext()
+    .CreateLogger()
 
             var app = builder.Build();
 

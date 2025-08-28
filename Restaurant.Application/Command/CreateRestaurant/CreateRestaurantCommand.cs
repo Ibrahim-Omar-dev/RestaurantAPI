@@ -1,8 +1,8 @@
-﻿using Restaurant.Model.Entity;
-
-namespace Restaurant.Application.Restaurants.Dtos
+﻿
+using MediatR;
+namespace Restaurant.Application.Command.CreateRestaurant
 {
-    public class CreateRestaurantDto
+    public class CreateRestaurantCommand : IRequest<int>
     {
         public string Name { get; set; }
         public string Description { get; set; }

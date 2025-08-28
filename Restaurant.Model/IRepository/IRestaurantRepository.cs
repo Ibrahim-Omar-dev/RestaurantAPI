@@ -7,6 +7,7 @@ namespace Restaurant.Model.IRepository
         Task<IEnumerable<Restaurantt>> GetAll();
         Task<Restaurantt> GetById(int id);
         Task<int> Create(Restaurantt restaurant);
-        Task<Restaurantt> Update(int id, Restaurantt restaurant);
+        Task Delete(Restaurantt restaurantt);
+        Task SaveChangeAsync();
     }
 }

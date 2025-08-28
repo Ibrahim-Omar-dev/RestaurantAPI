@@ -7,7 +7,7 @@ namespace Restaurant.Application.Extension
     {
         public static void AddApplication(this IServiceCollection services)
         {
-            services.AddScoped<IRepositoryServices, RepositoryServices>();
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ServiceCollectionExtensions).Assembly));
             services.AddAutoMapper(typeof(ServiceCollectionExtensions).Assembly);
         }
     }
