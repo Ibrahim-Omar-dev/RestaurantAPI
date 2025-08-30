@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using MediatR;
 using Restaurant.Model.IRepository;
+using Restaurents_API.Exceptions;
 
-namespace Restaurant.Application.Command.UpdateRestaurant
+namespace Restaurant.Application.Restaurants.Command.UpdateRestaurant
 {
-    class UpdateRestaurantCommandHandler : IRequestHandler<UpdateRestaurantCommand, bool>
+    class UpdateRestaurantCommandHandler : IRequestHandler<UpdateRestaurantCommand>
     {
         private readonly IRestaurantRepository restaurant;
         private readonly IMapper mapper;
@@ -14,17 +15,14 @@ namespace Restaurant.Application.Command.UpdateRestaurant
             this.restaurant = restaurant;
             this.mapper = mapper;
         }
-        public async Task<bool> Handle(UpdateRestaurantCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpdateRestaurantCommand request, CancellationToken cancellationToken)
         {
             var restaurantEntity = await restaurant.GetById(request.Id);
             if (restaurantEntity == null)
-            {
-                return false;
-            }
+                throw new NotFoundException(nameof(Restaurant), request.Id.ToString());
 
             mapper.Map(request, restaurantEntity);
             await restaurant.SaveChangeAsync();
-            return true;
         }
 
     }

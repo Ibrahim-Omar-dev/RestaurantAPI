@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Restaurant.Application.Command.CreateRestaurant;
-using Restaurant.Application.Command.UpdateRestaurant;
+using Restaurant.Application.Restaurants.Command.CreateRestaurant;
+using Restaurant.Application.Restaurants.Command.UpdateRestaurant;
 using Restaurant.Model.Entity;
 
 namespace Restaurant.Application.Restaurants.Dtos

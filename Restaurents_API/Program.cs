@@ -1,7 +1,6 @@
+﻿using Restaurant.Application.Extension;
 using Restaurants.infrastructure.Seeder;
 using Restaurants.Infrastructure.Extension;
-using Restaurant.Application.Extension;
-using Microsoft.AspNetCore.Builder;
 using Serilog;
 
 namespace Restaurents_API
@@ -10,52 +9,81 @@ namespace Restaurents_API
     {
         public static async Task Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
-
-            // Add services to the container.
-            builder.Services.AddControllers();
-
-            // Register Swagger (Swashbuckle)
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-
-            // Infrastructure & Application layers
-            builder.Services.AddInfrastructure(builder.Configuration);
-            builder.Services.AddApplication();
-
+            // configure Serilog first
             Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Debug() // ?? important, shows SQL
-    .WriteTo.Console()
-    .Enrich.FromLogContext()
-    .CreateLogger()
+                .WriteTo.Console()
+                .CreateBootstrapLogger();
 
-            var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+            try
             {
-                app.UseSwagger();
-                app.UseSwaggerUI(c =>
+                Log.Information("Starting up...");
+
+                var builder = WebApplication.CreateBuilder(args);
+
+                // full Serilog config from appsettings.json
+                builder.Host.UseSerilog((context, services, configuration) =>
+                    configuration.ReadFrom.Configuration(context.Configuration)
+                                 .ReadFrom.Services(services)
+                                 .Enrich.FromLogContext()
+                                 .WriteTo.Console()
+                );
+
+                // services
+                builder.Services.AddScoped<ErrorHandleing>();
+                builder.Services.AddControllers();
+                builder.Services.AddEndpointsApiExplorer();
+                builder.Services.AddSwaggerGen();
+
+                builder.Services.AddInfrastructure(builder.Configuration);
+                builder.Services.AddApplication();
+
+                var app = builder.Build();
+
+                // global error handler middleware
+                app.UseMiddleware<ErrorHandleing>();
+
+                if (app.Environment.IsDevelopment())
                 {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Restaurants API V1");
-                    c.RoutePrefix = string.Empty;
-                });
-            }
+                    app.UseSwagger();
+                    app.UseSwaggerUI(c =>
+                    {
+                        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Restaurants API V1");
+                        c.RoutePrefix = string.Empty; // Swagger at root
+                    });
+                }
 
-            // Seed database
-            using (var scope = app.Services.CreateScope())
+                // run DB seeder safely
+                using (var scope = app.Services.CreateScope())
+                {
+                    try
+                    {
+                        var seeder = scope.ServiceProvider.GetRequiredService<IRestaurantsSeeder>();
+                        await seeder.Seed();
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex, "Error while seeding the database");
+                    }
+                }
+
+                app.UseHttpsRedirection();
+                app.UseAuthorization();
+
+                // serve static files (wwwroot/index.html if present)
+                app.UseStaticFiles();
+
+                app.MapControllers();
+
+                await app.RunAsync();
+            }
+            catch (Exception ex)
             {
-                var seeder = scope.ServiceProvider.GetRequiredService<IRestaurantsSeeder>();
-                await seeder.Seed();
+                Log.Fatal(ex, "Application terminated unexpectedly");
             }
-
-            app.UseHttpsRedirection();
-
-            app.UseAuthorization();
-
-            app.MapControllers();
-
-            app.Run();
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
     }
 }

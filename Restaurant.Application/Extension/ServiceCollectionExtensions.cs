@@ -9,6 +9,7 @@ namespace Restaurant.Application.Extension
         {
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ServiceCollectionExtensions).Assembly));
             services.AddAutoMapper(typeof(ServiceCollectionExtensions).Assembly);
+
         }
     }
 }

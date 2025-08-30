@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Restaurant.Application.Queries.GetRestaurantById
+namespace Restaurant.Application.Restaurants.Queries.GetRestaurantById
 {
     class GetRestaurantByIdQueryHandler : IRequestHandler<GetRestaurantByIdQuery, RestaurantDto>
     {
@@ -17,7 +17,7 @@ namespace Restaurant.Application.Queries.GetRestaurantById
 
         public GetRestaurantByIdQueryHandler(IRestaurantRepository restaurant, IMapper mapper)
         {
-            this.repository = restaurant;
+            repository = restaurant;
             this.mapper = mapper;
         }
         public async Task<RestaurantDto> Handle(GetRestaurantByIdQuery request, CancellationToken cancellationToken)

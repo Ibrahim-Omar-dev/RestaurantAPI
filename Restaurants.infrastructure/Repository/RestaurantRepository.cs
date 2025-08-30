@@ -29,12 +29,14 @@ namespace Restaurants.infrastructure.Repository
 
         public async Task<IEnumerable<Restaurantt>> GetAll()
         {
-            return await context.Restaurants.ToListAsync();
+            return await context.Restaurants.Include(x => x.Dishes).ToListAsync();
         }
 
         public async Task<Restaurantt> GetById(int id)
         {
-            var restaurant = await context.Restaurants.FirstOrDefaultAsync(r => r.Id == id);
+            var restaurant = await context.Restaurants
+                .Include(r=>r.Dishes)
+                .FirstOrDefaultAsync(r => r.Id == id);
             return restaurant;
         }
 

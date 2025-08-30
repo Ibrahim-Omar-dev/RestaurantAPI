@@ -5,7 +5,7 @@ using Restaurant.Application.Restaurants.Dtos;
 using Restaurant.Model.Entity;
 using Restaurant.Model.IRepository;
 
-namespace Restaurant.Application.Command.CreateRestaurant
+namespace Restaurant.Application.Restaurants.Command.CreateRestaurant
 {
     public class CreateRestaurantCommandHandler : IRequestHandler<CreateRestaurantCommand, int>
     {
