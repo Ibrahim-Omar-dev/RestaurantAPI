@@ -1,0 +1,33 @@
+﻿using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
+
+namespace Restaurant.Application.Users
+{
+    public class UserContext : IUserContext
+    {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public UserContext(IHttpContextAccessor httpContextAccessor)
+        {
+            _httpContextAccessor = httpContextAccessor;
+        }
+        public CurrentUser? GetCurrentUser()
+        {
+            var user = _httpContextAccessor.HttpContext?.User;
+            if (user == null || !user.Identity.IsAuthenticated)
+            {
+                return null;
+            }
+            var userId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
+            var email = user.FindFirst(c => c.Type == ClaimTypes.Email)!.Value;
+            var roles = user.Claims.Where(c => c.Type == ClaimTypes.Role)!.Select(c => c.Value);
+            var nationality = user.FindFirst(c => c.Type == "Nationality")?.Value;
+            var dateOfBirthString = user.FindFirst(c => c.Type == "BirthDate")?.Value;
+            var dateOfBirth = dateOfBirthString == null
+                ? (DateOnly?)null
+                : DateOnly.ParseExact(dateOfBirthString, "yyyy-MM-dd");
+
+            return new CurrentUser(userId, email, roles, nationality, dateOfBirth);
+        }
+    }
+}

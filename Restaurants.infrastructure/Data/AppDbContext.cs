@@ -4,13 +4,14 @@ using Restaurant.Model.Entity;
 
 namespace Restaurants.infrastructure.Data
 {
-    internal class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<User>(options)
+    public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<User>(options)
     {
-        internal DbSet<Restaurantt> Restaurants { get; set; }
-        internal DbSet<Dish> Dishes { get; set; }
+        public DbSet<Restaurantt> Restaurants { get; set; }
+        public DbSet<Dish> Dishes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Restaurantt>(entity =>
             {
                 entity.HasKey(e => e.Id);

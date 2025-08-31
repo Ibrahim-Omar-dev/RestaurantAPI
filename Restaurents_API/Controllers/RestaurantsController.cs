@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Restaurant.Application.Restaurants.Command.CreateRestaurant;
 using Restaurant.Application.Restaurants.Command.DeleteRestaurant;
@@ -12,6 +13,7 @@ namespace Restaurants_API.Controllers
 {
     [ApiController]
     [Route("api/restaurants")]
+    [Authorize]
     public class RestaurantsController : ControllerBase
     {
         private readonly IMediator mediator;
@@ -26,6 +28,7 @@ namespace Restaurants_API.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<RestaurantDto>>> GetRestaurants()
         {
             logger.LogInformation("Fetching all restaurants at {Time}", DateTime.Now);
