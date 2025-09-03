@@ -21,6 +21,11 @@ namespace Restaurants.infrastructure.Data
                     .WithOne()
                     .HasForeignKey(d => d.RestaurantId)
                     .OnDelete(DeleteBehavior.Cascade);
+
+                modelBuilder.Entity<User>()
+                            .HasMany(o => o.OwnedRestaurants)
+                            .WithOne(r => r.Owner)
+                            .HasForeignKey(r => r.OwnerId);
             });
         }
     }

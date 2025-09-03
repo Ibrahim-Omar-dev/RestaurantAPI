@@ -3,11 +3,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Restaurant.Model.Entity;
+using Restaurant.Model.Interface;
 using Restaurant.Model.IRepository;
+using Restaurants.infrastructure.Authorization;
+using Restaurants.infrastructure.Authorization.Constant;
+using Restaurants.infrastructure.Authorization.Services;
 using Restaurants.infrastructure.Data;
 using Restaurants.infrastructure.Repository;
 using Restaurants.infrastructure.Seeder;
-using Restaurants.Infrastructure.Seeder;
 
 namespace Restaurants.Infrastructure.Extension;
 
@@ -19,14 +22,22 @@ public static class ServiceCollectionExtensions
         services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
 
         services.AddIdentityCore<User>()
-           .AddRoles<IdentityRole>()   // if you need roles
+           .AddRoles<IdentityRole>()
+           .AddClaimsPrincipalFactory<RestaurantsUserClaimsPrincipalFactory>()
            .AddEntityFrameworkStores<AppDbContext>();
 
+
         // Add Identity API endpoints separately
-        services.AddIdentityApiEndpoints<User>().AddEntityFrameworkStores<AppDbContext>();
+        services.AddIdentityApiEndpoints<User>();
 
         services.AddScoped<IRestaurantsSeeder, RestaurantsSeeder>();
         services.AddScoped<IRestaurantRepository, RestaurantRepository>();
         services.AddScoped<IDishesRepository, DishesRepository>();
+
+        services.AddAuthorizationBuilder()
+                .AddPolicy(PolicyName.HasNationality, policy =>
+                   policy.RequireClaim(AppClaimTypes.Nationality, "Franch", "American"));
+
+        services.AddScoped<IRestaurantAuthorizationService, RestaurantAuthorizationService>();
     }
 }

@@ -1,35 +1,50 @@
-﻿using Restaurant.Model.Entity;
+﻿using Microsoft.AspNetCore.Identity;
+using Restaurant.Model.Constant;
+using Restaurant.Model.Entity;
 using Restaurants.infrastructure.Data;
-
 using Restaurants.infrastructure.Seeder;
 
-namespace Restaurants.Infrastructure.Seeder
+public class RestaurantsSeeder : IRestaurantsSeeder
 {
-    internal class RestaurantsSeeder : IRestaurantsSeeder
+    private readonly AppDbContext _context;
+    private readonly RoleManager<IdentityRole> _roleManager;
+
+    public RestaurantsSeeder(AppDbContext context, RoleManager<IdentityRole> roleManager)
     {
-        private readonly AppDbContext _context;
+        _context = context;
+        _roleManager = roleManager;
+    }
 
-        public RestaurantsSeeder(AppDbContext context)
+    public async Task Seed()
+    {
+        if (await _context.Database.CanConnectAsync())
         {
-            _context = context;
-        }
-
-        public async Task Seed()
-        {
-            if (await _context.Database.CanConnectAsync())
+            if (!_context.Restaurants.Any())
             {
-                if (!_context.Restaurants.Any())
-                {
-                    var restaurants = GetRestaurants();
-                    _context.Restaurants.AddRange(restaurants);
-                    await _context.SaveChangesAsync();
-                }
+                var restaurants = GetRestaurants();
+                _context.Restaurants.AddRange(restaurants);
+                await _context.SaveChangesAsync();
+            }
+
+            await SeedRoles();
+        }
+    }
+
+    private async Task SeedRoles()
+    {
+        string[] roleNames = [UserRoles.User, UserRoles.Owner, UserRoles.Admin];
+
+        foreach (var role in roleNames)
+        {
+            if (!await _roleManager.RoleExistsAsync(role))
+            {
+                await _roleManager.CreateAsync(new IdentityRole(role));
             }
         }
-
-        private IEnumerable<Restaurantt> GetRestaurants()
-        {
-            return new List<Restaurantt>
+    }
+    private IEnumerable<Restaurantt> GetRestaurants()
+    {
+        return new List<Restaurantt>
             {
                 new Restaurantt
                 {
@@ -77,6 +92,7 @@ namespace Restaurants.Infrastructure.Seeder
                     }
                 }
             };
-        }
     }
+
 }
+

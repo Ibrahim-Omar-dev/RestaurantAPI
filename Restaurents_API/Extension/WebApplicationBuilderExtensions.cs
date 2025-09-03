@@ -1,4 +1,5 @@
 ﻿using Microsoft.OpenApi.Models;
+using Restaurants.API.Middlewares;
 using Serilog;
 
 namespace Restaurents_API.Extension
@@ -42,7 +43,7 @@ namespace Restaurents_API.Extension
                         }
                     });
             });
-            builder.Services.AddScoped<ErrorHandleing>();
+            builder.Services.AddScoped<ErrorHandlingMiddleware>();
         }
     }
 }

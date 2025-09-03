@@ -1,5 +1,6 @@
 ﻿using Restaurant.Application.Extension;
 using Restaurant.Model.Entity;
+using Restaurants.infrastructure.Seeder;
 using Restaurants.Infrastructure.Extension;
 using Restaurents_API.Extension;
 using Serilog;
@@ -24,6 +25,12 @@ namespace Restaurents_API
                 builder.Services.AddApplication();
 
                 var app = builder.Build();
+
+                using (var scope = app.Services.CreateScope())
+                {
+                    var seeder = scope.ServiceProvider.GetRequiredService<IRestaurantsSeeder>();
+                    await seeder.Seed();
+                }
 
                 // Configure pipeline
                 if (app.Environment.IsDevelopment())
