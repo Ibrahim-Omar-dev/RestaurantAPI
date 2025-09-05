@@ -31,10 +31,11 @@ namespace Restaurants_API.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<ActionResult<IEnumerable<RestaurantDto>>> GetRestaurants()
+
+        public async Task<ActionResult<IEnumerable<RestaurantDto>>> GetRestaurants([FromQuery] GetAllRestaurantQuery query)
         {
             logger.LogInformation("Fetching all restaurants at {Time}", DateTime.Now);
-            var restaurant = await mediator.Send(new GetAllRestaurantQuery());
+            var restaurant = await mediator.Send(query);
             return Ok(restaurant);
         }
 

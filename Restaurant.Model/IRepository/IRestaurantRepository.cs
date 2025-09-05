@@ -1,4 +1,5 @@
-﻿using Restaurant.Model.Entity;
+﻿using Restaurant.Model.Constant;
+using Restaurant.Model.Entity;
 
 namespace Restaurant.Model.IRepository
 {
@@ -9,5 +10,6 @@ namespace Restaurant.Model.IRepository
         Task<int> Create(Restaurantt restaurant);
         Task Delete(Restaurantt restaurantt);
         Task SaveChangeAsync();
+        Task<(IEnumerable<Restaurantt> Restaurants, int TotalCount)> GetAllMatching(string? searchPhrase, int pageSize = 5, int pageNumber = 1, string? sortedBy = null, SortDirection? sortedDirection = null);
     }
 }
